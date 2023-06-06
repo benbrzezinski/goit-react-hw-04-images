@@ -1,0 +1,20 @@
+:root {
+  --color-text-main: #212121;
+  --color-text-sec: #808080;
+  --color-text-third: #69707a;
+
+  --color-bg-main: #eee;
+  --color-bg-sec: #fff;
+  --color-bg-third: #3a3ab7;
+
+  --font-size-main: 16px;
+  --font-size-sec: 14px;
+  --font-size-third: 13px;
+
+  --font-weight: 500;
+  --color-border: #ccbebf;
+  --border-radius: 4px;
+
+  --transition-duration: 250ms;
+  --timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

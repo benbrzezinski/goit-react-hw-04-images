@@ -1,0 +1,27 @@
+.modalOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background-color: rgba(0 0 0 / 0.7);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-duration) var(--timing-function);
+}
+
+.modal {
+  display: contents;
+}
+
+.modal__img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: var(--border-radius);
+}
+
+.isVisible {
+  pointer-events: all;
+  opacity: 1;
+}

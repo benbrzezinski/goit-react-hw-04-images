@@ -1,0 +1,25 @@
+.btnBox {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 50px;
+}
+
+.btn {
+  width: 130px;
+  height: 40px;
+  color: var(--color-bg-sec);
+  background-color: var(--color-bg-third);
+  font-weight: var(--font-weight);
+  border: none;
+  border-radius: var(--border-radius);
+  transition: transform var(--transition-duration) var(--timing-function);
+
+  &:hover,
+  &:focus-visible {
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(1);
+  }
+}

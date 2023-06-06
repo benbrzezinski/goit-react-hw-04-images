@@ -1,0 +1,13 @@
+@use "src/utils/scss/mixins.scss" as *;
+
+.loader {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 300;
+
+  @include max-width(767px) {
+    top: 40%;
+  }
+}
