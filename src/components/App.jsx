@@ -50,7 +50,7 @@ const App = () => {
           }
 
           if (page > 1) {
-            setImages([...images, ...photos]);
+            setImages(images => [...images, ...photos]);
             setTimeout(
               () => window.scrollBy({ top: 500, behavior: "smooth" }),
               0
@@ -65,7 +65,7 @@ const App = () => {
     } else {
       setIsInitialMount(false);
     }
-  }, [searchQuery, page]);
+  }, [searchQuery, page, isInitialMount]);
 
   const handleSubmit = e => {
     e.preventDefault();

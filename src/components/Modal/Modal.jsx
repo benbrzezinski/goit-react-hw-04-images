@@ -18,7 +18,7 @@ const Modal = ({
     return () => {
       window.removeEventListener("keydown", closeModalOnEsc);
     };
-  }, [isModalOpen]);
+  }, [isModalOpen, closeModalOnEsc]);
 
   return (
     <div
