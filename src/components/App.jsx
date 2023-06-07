@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { enableBodyScroll, disableBodyScroll } from "body-scroll-lock";
@@ -10,135 +10,123 @@ import Modal from "./Modal/Modal";
 import Loader from "./Loader/Loader";
 import Api from "../utils/services/api";
 
-class App extends Component {
-  PER_PAGE = 12;
+const App = () => {
+  const PER_PAGE = 12;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [largeImageURL, setLargeImageURL] = useState("");
+  const [tags, setTags] = useState("");
+  const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
+  const [isInitialMount, setIsInitialMount] = useState(true);
+  const [areThereMorePhotos, setAreThereMorePhotos] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  state = {
-    searchQuery: "",
-    largeImageURL: "",
-    tags: "",
-    page: 1,
-    images: [],
-    status: false,
-    areThereMorePhotos: false,
-    isModalOpen: false,
-    isLoading: false,
-  };
+  useEffect(() => {
+    if (!isInitialMount) {
+      (async () => {
+        try {
+          setIsLoading(true);
 
-  async componentDidUpdate() {
-    const { searchQuery, page, status } = this.state;
+          const { hits: photos, totalHits: totalPhotos } =
+            await Api.fetchPhotosByQuery(searchQuery, page, PER_PAGE);
 
-    if (status) {
-      try {
-        this.setState({ status: false, isLoading: true });
+          if (!totalPhotos) {
+            setImages([]);
+            setAreThereMorePhotos(false);
 
-        const { hits: photos, totalHits: totalPhotos } =
-          await Api.fetchPhotosByQuery(searchQuery, page, this.PER_PAGE);
+            return toast.error("No photos found 🔍");
+          }
 
-        if (!totalPhotos) {
-          this.setState({
-            images: [],
-            areThereMorePhotos: false,
-          });
+          const areThereMorePhotos = Math.ceil(totalPhotos / PER_PAGE) > page;
+          setAreThereMorePhotos(areThereMorePhotos);
 
-          return toast.error("No photos found 🔍");
+          if (page === 1) {
+            setImages(photos);
+            setTimeout(
+              () => window.scrollTo({ top: 0, behavior: "smooth" }),
+              0
+            );
+          }
+
+          if (page > 1) {
+            setImages([...images, ...photos]);
+            setTimeout(
+              () => window.scrollBy({ top: 500, behavior: "smooth" }),
+              0
+            );
+          }
+        } catch (err) {
+          console.error(err.stack);
+        } finally {
+          setIsLoading(false);
         }
-
-        const areThereMorePhotos =
-          Math.ceil(totalPhotos / this.PER_PAGE) > page;
-        this.setState({ areThereMorePhotos });
-
-        if (page === 1) {
-          this.setState({ images: photos });
-          setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
-        }
-
-        if (page > 1) {
-          this.setState(({ images }) => ({
-            images: [...images, ...photos],
-          }));
-
-          setTimeout(
-            () => window.scrollBy({ top: 500, behavior: "smooth" }),
-            0
-          );
-        }
-      } catch (err) {
-        console.error(err.stack);
-      } finally {
-        this.setState({ isLoading: false });
-      }
+      })();
+    } else {
+      setIsInitialMount(false);
     }
-  }
+  }, [searchQuery, page]);
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
 
     const form = e.currentTarget;
     const searcher = form.elements.searcher.value;
 
-    this.setState({
-      searchQuery: searcher.toLowerCase().trim(),
-      page: 1,
-      status: true,
-    });
+    setSearchQuery(searcher.toLowerCase().trim());
+    setPage(1);
   };
 
-  getNextPage = () => {
-    this.setState(({ page }) => ({ page: page + 1, status: true }));
+  const getNextPage = () => {
+    setPage(page + 1);
   };
 
-  openModal = e => {
+  const openModal = e => {
     const largeImageURL = e.currentTarget.dataset.src;
     const tags = e.currentTarget.getAttribute("alt");
 
     disableBodyScroll(document.body);
-    this.setState({ largeImageURL, tags, isModalOpen: true });
+    setLargeImageURL(largeImageURL);
+    setTags(tags);
+    setIsModalOpen(true);
   };
 
-  closeModalOnClick = e => {
+  const closeModalOnClick = e => {
     if (e.currentTarget === e.target) {
       enableBodyScroll(document.body);
-      this.setState({ largeImageURL: "", tags: "", isModalOpen: false });
+      setLargeImageURL("");
+      setTags("");
+      setIsModalOpen(false);
     }
   };
 
-  closeModalOnEsc = e => {
+  const closeModalOnEsc = e => {
     if (e.code === "Escape") {
       enableBodyScroll(document.body);
-      this.setState({ largeImageURL: "", tags: "", isModalOpen: false });
+      setLargeImageURL("");
+      setTags("");
+      setIsModalOpen(false);
     }
   };
 
-  render() {
-    const {
-      largeImageURL,
-      tags,
-      images,
-      areThereMorePhotos,
-      isModalOpen,
-      isLoading,
-    } = this.state;
-
-    return (
-      <>
-        <Searchbar handleSubmit={this.handleSubmit} />
-        <ImageGallery>
-          <ImageGalleryItem images={images} openModal={this.openModal} />
-        </ImageGallery>
-        {areThereMorePhotos && <Button getNextPage={this.getNextPage} />}
-        <Modal
-          largeImageURL={largeImageURL}
-          tags={tags}
-          isModalOpen={isModalOpen}
-          closeModalOnClick={this.closeModalOnClick}
-          closeModalOnEsc={this.closeModalOnEsc}
-        />
-        <Loader isLoading={isLoading} />
-        <ToastContainer autoClose={3000} theme="colored" />
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Searchbar handleSubmit={handleSubmit} />
+      <ImageGallery>
+        <ImageGalleryItem images={images} openModal={openModal} />
+      </ImageGallery>
+      {areThereMorePhotos && <Button getNextPage={getNextPage} />}
+      <Modal
+        largeImageURL={largeImageURL}
+        tags={tags}
+        isModalOpen={isModalOpen}
+        closeModalOnClick={closeModalOnClick}
+        closeModalOnEsc={closeModalOnEsc}
+      />
+      <Loader isLoading={isLoading} />
+      <ToastContainer autoClose={3000} theme="colored" />
+    </>
+  );
+};
 
 export default App;

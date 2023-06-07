@@ -1,32 +1,36 @@
-import { Component } from "react";
+import { useEffect } from "react";
 import PropTypes from "prop-types";
 import scss from "./Modal.module.scss";
 import clsx from "clsx";
 
-class Modal extends Component {
-  componentDidUpdate() {
-    const { isModalOpen, closeModalOnEsc } = this.props;
+const Modal = ({
+  largeImageURL,
+  tags,
+  isModalOpen,
+  closeModalOnClick,
+  closeModalOnEsc,
+}) => {
+  useEffect(() => {
+    if (isModalOpen) {
+      window.addEventListener("keydown", closeModalOnEsc);
+    }
 
-    isModalOpen
-      ? window.addEventListener("keydown", closeModalOnEsc)
-      : window.removeEventListener("keydown", closeModalOnEsc);
-  }
+    return () => {
+      window.removeEventListener("keydown", closeModalOnEsc);
+    };
+  }, [isModalOpen]);
 
-  render() {
-    const { largeImageURL, tags, isModalOpen, closeModalOnClick } = this.props;
-
-    return (
-      <div
-        className={clsx(scss.modalOverlay, isModalOpen && scss.isVisible)}
-        onClick={closeModalOnClick}
-      >
-        <div className={scss.modal}>
-          <img className={scss.modal__img} src={largeImageURL} alt={tags} />
-        </div>
+  return (
+    <div
+      className={clsx(scss.modalOverlay, isModalOpen && scss.isVisible)}
+      onClick={closeModalOnClick}
+    >
+      <div className={scss.modal}>
+        <img className={scss.modal__img} src={largeImageURL} alt={tags} />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 Modal.propTypes = {
   largeImageURL: PropTypes.string.isRequired,
