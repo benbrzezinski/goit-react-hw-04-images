@@ -15,15 +15,14 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [largeImageURL, setLargeImageURL] = useState("");
   const [tags, setTags] = useState("");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [images, setImages] = useState([]);
-  const [isInitialMount, setIsInitialMount] = useState(true);
   const [areThereMorePhotos, setAreThereMorePhotos] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!isInitialMount) {
+    if (page > 0) {
       (async () => {
         try {
           setIsLoading(true);
@@ -34,7 +33,6 @@ const App = () => {
           if (!totalPhotos) {
             setImages([]);
             setAreThereMorePhotos(false);
-
             return toast.error("No photos found 🔍");
           }
 
@@ -58,14 +56,13 @@ const App = () => {
           }
         } catch (err) {
           console.error(err.stack);
+          toast.error("Ups, something went wrong :(");
         } finally {
           setIsLoading(false);
         }
       })();
-    } else {
-      setIsInitialMount(false);
     }
-  }, [searchQuery, page, isInitialMount]);
+  }, [searchQuery, page]);
 
   const handleSubmit = e => {
     e.preventDefault();
