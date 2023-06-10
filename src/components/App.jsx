@@ -12,9 +12,9 @@ import Api from "../utils/services/api";
 
 const App = () => {
   const PER_PAGE = 12;
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [largeImageURL, setLargeImageURL] = useState("");
-  const [tags, setTags] = useState("");
+  const [imgInfo, setImgInfo] = useState({ largeImageURL: "", tags: "" });
   const [page, setPage] = useState(0);
   const [images, setImages] = useState([]);
   const [areThereMorePhotos, setAreThereMorePhotos] = useState(false);
@@ -83,16 +83,14 @@ const App = () => {
     const tags = e.currentTarget.getAttribute("alt");
 
     disableBodyScroll(document.body);
-    setLargeImageURL(largeImageURL);
-    setTags(tags);
+    setImgInfo({ largeImageURL, tags });
     setIsModalOpen(true);
   };
 
   const closeModalOnClick = e => {
     if (e.currentTarget === e.target) {
       enableBodyScroll(document.body);
-      setLargeImageURL("");
-      setTags("");
+      setImgInfo({ largeImageURL: "", tags: "" });
       setIsModalOpen(false);
     }
   };
@@ -100,8 +98,7 @@ const App = () => {
   const closeModalOnEsc = e => {
     if (e.code === "Escape") {
       enableBodyScroll(document.body);
-      setLargeImageURL("");
-      setTags("");
+      setImgInfo({ largeImageURL: "", tags: "" });
       setIsModalOpen(false);
     }
   };
@@ -114,8 +111,8 @@ const App = () => {
       </ImageGallery>
       {areThereMorePhotos && <Button getNextPage={getNextPage} />}
       <Modal
-        largeImageURL={largeImageURL}
-        tags={tags}
+        largeImageURL={imgInfo.largeImageURL}
+        tags={imgInfo.tags}
         isModalOpen={isModalOpen}
         closeModalOnClick={closeModalOnClick}
         closeModalOnEsc={closeModalOnEsc}
