@@ -48,7 +48,7 @@ const App = () => {
           }
 
           if (page > 1) {
-            setImages(images => [...images, ...photos]);
+            setImages(i => [...i, ...photos]);
             setTimeout(
               () => window.scrollBy({ top: 500, behavior: "smooth" }),
               0
@@ -75,7 +75,7 @@ const App = () => {
   };
 
   const getNextPage = () => {
-    setPage(page + 1);
+    setPage(p => p + 1);
   };
 
   const openModal = e => {
